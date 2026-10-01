@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Calculadora Legal Equity</title>
+<link rel="icon" type="image/png" href="Public/D20_logo_verde_D.png">
+<link rel="apple-touch-icon" href="Public/D20_logo_verde_D.png">
 <script>
   (function(){
     var t = null;
@@ -141,12 +143,14 @@
     background:var(--surface); border:1px solid var(--border); border-radius:16px;
     box-shadow:var(--shadow); padding:20px;
   }
-  @media (min-width:920px){ .card.sticky{position:sticky; top:var(--space)} }
   .panel-title{
     display:flex; align-items:center; gap:10px;
     font-family:"Poppins", sans-serif; font-size:.98rem; font-weight:600; margin:0 0 16px;
   }
   .panel-title .bar{width:4px; height:18px; border-radius:2px; background:linear-gradient(180deg, var(--d20-menta), var(--d20-escuro))}
+  .escada-head{display:flex; align-items:center; justify-content:space-between; gap:10px 16px; flex-wrap:wrap; margin-bottom:16px}
+  .escada-head .panel-title{margin:0}
+  .offer-head h3 .canal{font-weight:400}
   .panel-title small{font-family:"Inter", sans-serif; font-weight:400; font-size:.8rem; color:var(--muted); margin-left:auto}
 
   /* ---------- Campos ---------- */
@@ -195,23 +199,65 @@
     margin:18px 0 10px; padding-bottom:6px; border-bottom:1px dashed var(--border);
   }
 
+  /* Stepper (−/+) */
+  .stepper{display:grid; grid-template-columns:42px minmax(0,1fr) 42px; gap:8px; align-items:stretch}
+  .stepper input{text-align:center}
+  .step-btn{
+    font:inherit; font-size:1.15rem; font-weight:600; line-height:1; min-height:42px; border-radius:10px; cursor:pointer;
+    border:1px solid var(--border-strong); background:var(--surface-2); color:var(--accent);
+    transition:background .15s, border-color .15s, transform .1s;
+  }
+  .step-btn:hover{border-color:var(--d20-verde); background:var(--accent-soft)}
+  .step-btn:active{transform:scale(.95)}
+  .step-btn:focus-visible{outline:none; box-shadow:0 0 0 4px var(--ring)}
+
+  /* Simulações opcionais */
+  .opt-group{margin:4px 0 6px; padding-top:14px; border-top:1px solid var(--border)}
+  .opt-title{font-size:.7rem; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:12px}
+  .input-affix input.wide-suf{padding-right:64px}
+
+  .sim-card{
+    background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--d20-verde);
+    border-radius:16px; box-shadow:var(--shadow); padding:16px 18px; margin-bottom:var(--space);
+    display:flex; flex-direction:column; gap:12px;
+  }
+  .sim-card.inviavel, .sim-card.alerta{border-left-color:var(--warn-border)}
+  .sim-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap}
+  .sim-eyebrow{font-size:.7rem; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--accent)}
+  .sim-head h3{font-size:1rem; font-weight:600; margin-top:2px}
+  .sim-head h3 .capado{font-weight:500; color:var(--muted)}
+  .pill{font-size:.72rem; font-weight:600; padding:4px 10px; border-radius:999px; white-space:nowrap}
+  .pill.ok{background:var(--accent-soft); color:var(--accent)}
+  .pill.warn{background:var(--warn-bg); color:var(--warn-text); border:1px solid var(--warn-border)}
+  .sim-note{font-size:.8rem; line-height:1.5; color:var(--warn-text); background:var(--warn-bg); border:1px solid var(--warn-border); border-radius:10px; padding:9px 12px}
+  .sim-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
+  @media (max-width:640px){ .sim-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+  .sim-grid .stat{background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:10px 12px; min-width:0}
+  .sim-grid .stat.destaque{background:var(--accent-soft); border-color:transparent}
+  .sim-grid .k{font-size:.72rem; color:var(--muted)}
+  .sim-grid .v{font-family:"Poppins", sans-serif; font-weight:600; font-size:1rem; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .sim-grid .stat.destaque .v{color:var(--accent); font-size:1.15rem}
+  .sim-grid .v small{display:block; font-family:"Inter", sans-serif; font-weight:400; font-size:.72rem; color:var(--muted)}
+
   .warn-inline{font-size:.8rem; color:var(--warn-text); background:var(--warn-bg); border:1px solid var(--warn-border); border-radius:10px; padding:9px 12px; margin:-2px 0 12px}
 
   /* ---------- Resumo do caso ---------- */
   .case-strip{
-    display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1px; margin-bottom:var(--space);
+    display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:1px; margin-bottom:var(--space);
     background:var(--border); border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:var(--shadow);
   }
   .case-strip > div{background:var(--surface); padding:12px 14px; min-width:0}
   .case-strip .k{font-size:.72rem; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
   .case-strip .v{font-family:"Poppins", sans-serif; font-weight:600; font-size:1rem; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-  @media (max-width:640px){ .case-strip{grid-template-columns:repeat(2,minmax(0,1fr))} }
+  @media (max-width:640px){ .case-strip{grid-template-columns:repeat(2,minmax(0,1fr))} .case-strip > div:last-child{grid-column:span 2} }
 
   /* ---------- Escada de ofertas ---------- */
   .results{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; align-items:stretch}
   /* Empilhado: a oferta vigente (Tabela Preta) sobe para o topo */
   @media (max-width:1100px) and (min-width:921px){ .results{grid-template-columns:1fr} .offer.vigente{order:-1} }
   @media (max-width:760px){ .results{grid-template-columns:1fr} .offer.vigente{order:-1} }
+  @media (min-width:1101px){ .results.quatro{grid-template-columns:repeat(2,minmax(0,1fr))} }
+  @media (max-width:920px) and (min-width:761px){ .results{grid-template-columns:repeat(2,minmax(0,1fr))} .offer.vigente{order:-1} }
 
   .offer{
     background:var(--surface); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow);
@@ -223,6 +269,7 @@
   .offer[data-tier="azul"]{--tier-color:#2f74b5; --tier-ink:var(--tier-azul); --tier-bg:var(--tier-azul-bg)}
   .offer[data-tier="preta"]{--tier-color:var(--tier-preta); --tier-ink:var(--tier-preta); --tier-bg:var(--tier-preta-bg)}
   .offer.vigente{border:1.5px solid var(--d20-escuro)}
+  .offer[data-tier="custom"]{--tier-color:var(--d20-menta); --tier-ink:var(--accent); --tier-bg:var(--accent-soft); border-style:dashed}
   .offer.vigente::before{background:linear-gradient(90deg, var(--d20-menta), var(--d20-verde), var(--d20-escuro))}
   .offer.inviavel{opacity:.65}
 
@@ -239,6 +286,10 @@
     font-size:.68rem; font-weight:600; letter-spacing:.04em; text-transform:uppercase; white-space:nowrap;
     color:#fff; background:var(--d20-escuro); border-radius:999px; padding:4px 9px;
   }
+  .piso-badge{
+    font-size:.68rem; font-weight:600; white-space:nowrap; color:var(--warn-text);
+    background:var(--warn-bg); border:1px solid var(--warn-border); border-radius:999px; padding:3px 8px;
+  }
   .alcada-badge{
     font-size:.68rem; font-weight:500; white-space:nowrap; color:var(--muted);
     border:1px solid var(--border-strong); border-radius:999px; padding:3px 8px;
@@ -251,6 +302,9 @@
   .offer.inviavel .big-figure .value{color:var(--muted)}
   .big-figure .teto-note{font-size:.74rem; color:var(--muted); margin-top:6px; line-height:1.4}
   .big-figure .teto-note b{color:var(--text); font-weight:600}
+  .big-figure .piso-note{color:var(--warn-text)}
+  .offer.abaixo-piso .big-figure{background:var(--warn-bg); border-color:var(--warn-border)}
+  .offer.abaixo-piso .big-figure .value{color:var(--warn-text)}
 
   .kv-list{display:flex; flex-direction:column; font-size:.85rem}
   .kv-list .kv{display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:7px 0; border-bottom:1px solid var(--border)}
@@ -309,7 +363,7 @@
   </div>
 
   <div class="layout">
-    <section class="card sticky" id="panel-inputs" aria-labelledby="t-inputs">
+    <section class="card" id="panel-inputs" aria-labelledby="t-inputs">
       <h2 class="panel-title" id="t-inputs"><span class="bar"></span>Dados do caso</h2>
 
       <div class="field">
@@ -365,6 +419,19 @@
         </select>
       </div>
 
+      <div class="field">
+        <label for="in-sobrecolat">Sobrecolateralização</label>
+        <div class="stepper">
+          <button type="button" class="step-btn" data-step-target="in-sobrecolat" data-step="-5" aria-label="Diminuir sobrecolateralização">−</button>
+          <div class="input-affix">
+            <input type="number" id="in-sobrecolat" class="has-suf num" min="0" step="5" value="100">
+            <span class="affix suf">%</span>
+          </div>
+          <button type="button" class="step-btn" data-step-target="in-sobrecolat" data-step="5" aria-label="Aumentar sobrecolateralização">+</button>
+        </div>
+        <div class="hint">Garantia exigida sobre o VP do reclamante. Baixar aumenta o crédito liberado (e o risco); subir reduz os dois.</div>
+      </div>
+
       <div class="row2">
         <div class="field">
           <label for="in-hon-sucumb">Honorários sucumbenciais</label>
@@ -382,18 +449,49 @@
         </div>
       </div>
 
-      <div class="field">
-        <label for="in-canal">Comissão do canal — corban</label>
-        <select id="in-canal">
-          <option value="0" selected>0%</option>
-          <option value="6">6%</option>
-          <option value="8">8%</option>
-          <option value="10">10%</option>
-        </select>
-        <div class="hint">6/8/10% acompanham a escada Mínima/2/1 quando há parceiro de canal remunerado; ajuste livre.</div>
-      </div>
-
       <div id="warn-honorarios" class="warn-inline" role="alert" hidden></div>
+
+      <div class="opt-group">
+        <div class="opt-title">Simulações opcionais</div>
+
+        <div class="field">
+          <label for="in-canal">Comissão do canal — corban</label>
+          <select id="in-canal">
+            <option value="0" selected>0%</option>
+            <option value="6">6%</option>
+            <option value="8">8%</option>
+            <option value="10">10%</option>
+          </select>
+          <div class="hint">Vale para a conta inversa, a taxa comercial e a TIR customizada. A escada usa 10/8/6% por tabela (alternador acima das ofertas).</div>
+        </div>
+
+        <div class="field">
+          <label for="in-valor-desejado">Valor desejado na conta do cliente</label>
+          <div class="input-affix">
+            <span class="affix pre">R$</span>
+            <input type="number" id="in-valor-desejado" class="has-pre num" min="0" step="100" placeholder="ex.: 20000" inputmode="decimal">
+          </div>
+          <div class="hint">Conta inversa: acha a taxa que faz cair exatamente esse valor.</div>
+        </div>
+
+        <div class="field">
+          <label for="in-taxa-comercial">Taxa de juros comercial desejada</label>
+          <div class="input-affix">
+            <input type="number" id="in-taxa-comercial" class="has-suf wide-suf num" min="0" step="0.1" placeholder="ex.: 7" inputmode="decimal">
+            <span class="affix suf">% a.m.</span>
+          </div>
+          <div class="hint">Acha o crédito liberado para essa taxa cobrada na CCB.</div>
+        </div>
+
+        <div class="field">
+          <label for="in-tir-custom">TIR-alvo customizada</label>
+          <div class="input-affix">
+            <input type="number" id="in-tir-custom" class="has-suf wide-suf num" min="0" step="1" placeholder="ex.: 35" inputmode="decimal">
+            <span class="affix suf">% a.a.</span>
+          </div>
+          <div class="hint">Adiciona uma 4ª oferta, sob medida, à escada.</div>
+        </div>
+      </div>
 
       <details class="adv">
         <summary><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>Parâmetros avançados</summary>
@@ -409,15 +507,9 @@
             <input type="number" id="in-spread" class="num" min="0" step="0.1" value="1">
           </div>
         </div>
-        <div class="row2">
-          <div class="field">
-            <label for="in-haircut">Haircut sobre a garantia (%)</label>
-            <input type="number" id="in-haircut" class="num" min="0" max="100" step="0.5" value="0">
-          </div>
-          <div class="field">
-            <label for="in-sobrecolat">Sobrecolateralização (%)</label>
-            <input type="number" id="in-sobrecolat" class="num" min="0" step="5" value="100">
-          </div>
+        <div class="field">
+          <label for="in-haircut">Haircut sobre a garantia (%)</label>
+          <input type="number" id="in-haircut" class="num" min="0" max="100" step="0.5" value="0">
         </div>
 
         <div class="adv-group-title">Cenários (performado / excussão / inadimplido)</div>
@@ -537,9 +629,16 @@
     </section>
 
     <section aria-labelledby="t-results">
-      <div class="case-strip" id="case-strip" aria-live="polite"></div>
+      <div class="case-strip" id="case-strip"></div>
+      <div id="sim-wrap"></div>
       <div class="card" style="padding:18px 18px 20px">
-        <h2 class="panel-title" id="t-results"><span class="bar"></span>Escada de ofertas<small>TIR ponderada a.a.</small></h2>
+        <div class="escada-head">
+          <h2 class="panel-title" id="t-results"><span class="bar"></span>Escada de ofertas<small>TIR ponderada a.a.</small></h2>
+          <div class="seg" role="group" aria-label="Comissão de canal na escada">
+            <button type="button" id="seg-canal-com" aria-pressed="true" title="Verde 10% · Azul 8% · Preta 6%">Com canal</button>
+            <button type="button" id="seg-canal-sem" aria-pressed="false">Sem canal</button>
+          </div>
+        </div>
         <div class="results" id="results"></div>
       </div>
     </section>
@@ -818,6 +917,89 @@ class CalculadoraCredito {
     for (const r of retornos) out[r] = this.ofertar(valorLiquidoEsperado, prazoMeses, r);
     return out;
   }
+
+  // Conta inversa: dado o valor que deve cair na conta, acha a taxa base (i) que bate esse alvo
+  // e devolve a TIR ponderada resultante, para conferir contra o piso de 30% (§14.4 do motor).
+  // valorLiberado é estritamente decrescente em i, então a busca é sempre bem-posta.
+  ofertarPorValorDesejado(valorLiquidoEsperado, prazoMeses, valorDesejado) {
+    const erro = (i) => this.simular(valorLiquidoEsperado, prazoMeses, i).valorLiberado - valorDesejado;
+    const minimo = 1e-6;
+    const simMin = this.simular(valorLiquidoEsperado, prazoMeses, minimo);
+    if (!(simMin.valorLiberado >= valorDesejado)) {
+      return { inviavel: true, motivo: 'alto', maximoPossivel: simMin.valorLiberado };
+    }
+    let maximo = 1.0;
+    while (erro(maximo) > 0 && maximo < 64) maximo *= 2;
+    if (erro(maximo) > 0) return { inviavel: true, motivo: 'baixo', maximoPossivel: null };
+
+    const i = raiz(erro, minimo, maximo);
+    if (Number.isNaN(i)) return { inviavel: true, motivo: 'erro', maximoPossivel: null };
+    const sim = this.simular(valorLiquidoEsperado, prazoMeses, i);
+    const contrato = sim.contrato;
+    const r = contrato.taxaJurosMensal;
+
+    return {
+      inviavel: false,
+      valorDesejado,
+      valorLiquidoEsperado,
+      prazoMeses,
+      taxaJurosMensal: r,
+      taxaJurosAnual: anualizar(r),
+      valorContrato: contrato.valorContrato,
+      valorLiberado: sim.valorLiberado,
+      valorAPagar: contrato.valorContrato * Math.pow(1 + r, prazoMeses),
+      pmt: contrato.valorContrato * r / (1 - Math.pow(1 + r, -prazoMeses)),
+      tirPerformadoMensal: i,
+      tirPonderadaAnual: sim.tirPonderadaAnual,
+      simulacao: sim,
+    };
+  }
+
+  // Taxa comercial direta: dado a taxa de juros mensal que se quer cobrar do cliente (a taxa contratada
+  // da CCB, não a taxa do fluxo performado "i"), acha o i que produz essa taxa contratada.
+  // A taxa contratada é estritamente crescente em i (mesmo sentido em que valorLiberado é decrescente),
+  // então a busca é sempre bem-posta; o piso é a taxa mínima possível (i -> 0), não há teto de taxa.
+  ofertarPorTaxaComercial(valorLiquidoEsperado, prazoMeses, taxaDesejadaMensal) {
+    const erro = (i) => this.simular(valorLiquidoEsperado, prazoMeses, i).contrato.taxaJurosMensal - taxaDesejadaMensal;
+    const minimo = 1e-6;
+    const simMin = this.simular(valorLiquidoEsperado, prazoMeses, minimo);
+    if (!(simMin.contrato.taxaJurosMensal <= taxaDesejadaMensal)) {
+      return { inviavel: true, motivo: 'baixo', minimoPossivel: simMin.contrato.taxaJurosMensal };
+    }
+    let maximo = 1.0;
+    while (erro(maximo) < 0 && maximo < 64) maximo *= 2;
+    if (erro(maximo) < 0) return { inviavel: true, motivo: 'alto', minimoPossivel: null };
+
+    const i = raiz(erro, minimo, maximo);
+    if (Number.isNaN(i)) return { inviavel: true, motivo: 'erro', minimoPossivel: null };
+    const sim = this.simular(valorLiquidoEsperado, prazoMeses, i);
+    if (!(sim.valorLiberado > 0)) return { inviavel: true, motivo: 'erro', minimoPossivel: null };
+
+    const contrato = sim.contrato;
+    let valorLiberado = sim.valorLiberado, principalPmt = contrato.valorContrato;
+    if (this.tetoValorLiberado !== null && valorLiberado > this.tetoValorLiberado) {
+      valorLiberado = this.tetoValorLiberado;
+      principalPmt = this.tetoValorLiberado / (1 - this.custos.deducoesLiberacao);
+    }
+    const r = contrato.taxaJurosMensal;
+
+    return {
+      inviavel: false,
+      taxaDesejadaMensal,
+      valorLiquidoEsperado,
+      prazoMeses,
+      taxaJurosMensal: r,
+      taxaJurosAnual: anualizar(r),
+      valorContrato: principalPmt,
+      valorLiberado,
+      valorLiberadoSemTeto: sim.valorLiberado,
+      valorAPagar: principalPmt * Math.pow(1 + r, prazoMeses),
+      pmt: principalPmt * r / (1 - Math.pow(1 + r, -prazoMeses)),
+      tirPerformadoMensal: i,
+      tirPonderadaAnual: sim.tirPonderadaAnual,
+      simulacao: sim,
+    };
+  }
 }
 
 function ultimoDeFevereiro(d) {
@@ -863,10 +1045,11 @@ function mesesAte(inicio, pagamento) {
   const num = (id) => parseFloat($(id).value);
   const pct = (id) => num(id) / 100;
 
-  function montarCustos(){
+  // corbanOverride: comissão de canal da escada (por tabela); sem override usa o campo "Comissão do canal".
+  function montarCustos(corbanOverride){
     return new CustosCredito({
       iof: pct('in-iof'),
-      comissaoCorban: pct('in-canal'),
+      comissaoCorban: corbanOverride !== undefined ? corbanOverride : pct('in-canal'),
       comissaoArtemis: pct('in-com-artemis'),
       cobrancaArtemis: pct('in-cobranca-artemis'),
       tac: pct('in-tac'),
@@ -915,21 +1098,30 @@ function mesesAte(inicio, pagamento) {
     return n;
   }
 
+  // Comissão de canal travada por tabela: Oferta 1 10% · Oferta 2 8% · Mínima 6%,
+  // por cima dos 6% fixos da Artemis. "Sem canal" simula a mesma escada com corban 0%.
   const TIERS = [
-    { retorno: 0.5, tag: 'verde', nome: 'Tabela Verde', oferta: 'Oferta 1', vigente: false },
-    { retorno: 0.4, tag: 'azul', nome: 'Tabela Azul', oferta: 'Oferta 2', vigente: false },
-    { retorno: 0.3, tag: 'preta', nome: 'Tabela Preta', oferta: 'Oferta Mínima', vigente: true },
+    { retorno: 0.5, tag: 'verde', nome: 'Tabela Verde', oferta: 'Oferta 1', vigente: false, corban: 0.10 },
+    { retorno: 0.4, tag: 'azul', nome: 'Tabela Azul', oferta: 'Oferta 2', vigente: false, corban: 0.08 },
+    { retorno: 0.3, tag: 'preta', nome: 'Tabela Preta', oferta: 'Oferta Mínima', vigente: true, corban: 0.06 },
   ];
+  let escadaComCanal = true;
+  const corbanDoTier = (tier) => tier.corban === undefined ? pct('in-canal') : (escadaComCanal ? tier.corban : 0);
+
+  const PISO = TIERS[TIERS.length - 1].retorno; // piso de política = Tabela Preta (30%)
 
   const chev = '<svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>';
 
-  function cabecalho(tier){
+  function cabecalho(tier, abaixoDoPiso){
     return `<div class="offer-head">
         <div>
           <span class="tier-tag"><span class="dot"></span>${tier.nome}</span>
-          <h3>${tier.oferta} <span class="tir"><span class="sep">· </span>TIR ${fmtPct(tier.retorno,0)}</span></h3>
+          <h3>${tier.oferta} <span class="tir"><span class="sep">· </span>TIR ${fmtPct(tier.retorno,0)}<span class="canal"> · canal ${fmtPct(corbanDoTier(tier),0)}</span></span></h3>
         </div>
-        ${tier.vigente ? '<span class="vigente-badge">Vigente</span>' : '<span class="alcada-badge">Alçada</span>'}
+        ${abaixoDoPiso ? '<span class="piso-badge">Abaixo do piso</span>'
+          : tier.vigente ? '<span class="vigente-badge">Vigente</span>'
+          : tier.custom ? '<span class="alcada-badge">Sob medida</span>'
+          : '<span class="alcada-badge">Alçada</span>'}
       </div>`;
   }
 
@@ -943,14 +1135,16 @@ function mesesAte(inicio, pagamento) {
 
   function cardOferta(tier, oferta){
     const capado = oferta.valorLiberado < oferta.valorLiberadoSemTeto - 0.005;
+    const abaixoDoPiso = oferta.tirPonderadaAnual < PISO - 1e-9;
     const sim = oferta.simulacao;
-    return `<article class="offer${tier.vigente ? ' vigente' : ''}" data-tier="${tier.tag}">
-      ${cabecalho(tier)}
+    return `<article class="offer${tier.vigente ? ' vigente' : ''}${abaixoDoPiso ? ' abaixo-piso' : ''}" data-tier="${tier.tag}">
+      ${cabecalho(tier, abaixoDoPiso)}
 
       <div class="big-figure">
         <div class="label">Crédito liberado (cai na conta)</div>
         <div class="value num">${fmtBRL(oferta.valorLiberado)}</div>
         ${capado ? `<div class="teto-note">Teto aplicado — sem teto seria <b class="num">${fmtBRL(oferta.valorLiberadoSemTeto)}</b></div>` : ''}
+        ${abaixoDoPiso ? `<div class="teto-note piso-note">TIR ponderada ${fmtPct(oferta.tirPonderadaAnual,2)} a.a., abaixo do piso de política (${fmtPct(PISO,0)}) — oferta não pode ser praticada nesta configuração. Mostrada só para referência; os números não mudam.</div>` : ''}
       </div>
 
       <div class="kv-list">
@@ -978,12 +1172,82 @@ function mesesAte(inicio, pagamento) {
     const tetoSel = $('in-teto');
     const tetoTxt = tetoSel.value === 'none' ? 'Sem teto' : fmtBRL(parseFloat(tetoSel.value));
     const nome = $('in-nome').value.trim();
-    const canal = $('in-canal').value + '%';
+    const canal = escadaComCanal ? '10/8/6%' : 'Sem canal';
     $('case-strip').innerHTML = `
       <div><div class="k">${nome ? esc(nome) : 'Valor da condenação'}</div><div class="v num">${valor > 0 ? fmtBRL(valor) : '—'}</div></div>
       <div><div class="k">Prazo</div><div class="v num">${prazo ? prazo + (prazo === 1 ? ' mês' : ' meses') : '—'}</div></div>
       <div><div class="k">Teto liberado</div><div class="v num">${tetoTxt}</div></div>
-      <div><div class="k">Comissão do canal</div><div class="v num">${canal}</div></div>`;
+      <div><div class="k">Sobrecolateralização</div><div class="v num">${isFinite(num('in-sobrecolat')) ? num('in-sobrecolat').toLocaleString('pt-BR') + '%' : '—'}</div></div>
+      <div><div class="k">Canal na escada</div><div class="v num">${canal}</div></div>`;
+  }
+
+  const stat = (k, v, destaque) => `<div class="stat${destaque ? ' destaque' : ''}"><div class="k">${k}</div><div class="v num">${v}</div></div>`;
+  const pillPiso = (r) => r.tirPonderadaAnual < PISO - 1e-9
+    ? `<span class="pill warn">Abaixo do piso de ${fmtPct(PISO,0)}</span>`
+    : `<span class="pill ok">TIR ${fmtPct(r.tirPonderadaAnual,1)} ≥ piso</span>`;
+
+  function cardSimInviavel(eyebrow, titulo, msg, extra){
+    return `<section class="sim-card inviavel">
+      <div class="sim-head"><div><div class="sim-eyebrow">${eyebrow}</div><h3>${titulo}</h3></div><span class="pill warn">Inviável</span></div>
+      ${extra || ''}
+      <div class="sim-note">${msg}</div>
+    </section>`;
+  }
+
+  // Teto de crédito liberado é política dura: a conta inversa resolve para min(valor pedido, teto).
+  function cardContaInversa(valorDesejado, valorAlvo, resultado, teto){
+    const acimaDoTeto = teto != null && valorDesejado > teto + 0.005;
+    const titulo = acimaDoTeto
+      ? `Alvo de ${fmtBRL(valorDesejado)} <span class="capado">→ limitado ao teto de ${fmtBRL(valorAlvo)}</span>`
+      : `Alvo de ${fmtBRL(valorDesejado)} na conta`;
+    const notaTeto = acimaDoTeto
+      ? `<div class="sim-note">Valor pedido (${fmtBRL(valorDesejado)}) acima do teto de crédito liberado selecionado (${fmtBRL(teto)}) — o cálculo abaixo é feito para o teto, não para o valor pedido.</div>`
+      : '';
+    if (!resultado || resultado.inviavel){
+      const msg = (resultado && resultado.motivo === 'alto')
+        ? `Esse valor não é alcançável nem com taxa próxima de zero — o máximo possível para este caso é <b class="num">${fmtBRL(resultado.maximoPossivel)}</b>. Reduza a sobrecolateralização, aumente o prazo ou reveja o valor da condenação.`
+        : 'Não foi possível calcular a taxa para este valor com os dados informados.';
+      return cardSimInviavel('Conta inversa', titulo, msg, notaTeto);
+    }
+    const abaixoDoPiso = resultado.tirPonderadaAnual < PISO - 1e-9;
+    return `<section class="sim-card${abaixoDoPiso ? ' alerta' : ''}">
+      <div class="sim-head"><div><div class="sim-eyebrow">Conta inversa</div><h3>${titulo}</h3></div>${pillPiso(resultado)}</div>
+      ${notaTeto}
+      ${abaixoDoPiso ? `<div class="sim-note">A taxa que bate esse valor resulta em TIR ponderada de ${fmtPct(resultado.tirPonderadaAnual,2)} a.a., abaixo do piso de política (${fmtPct(PISO,0)}) — esta oferta não pode ser praticada nesta configuração. Considere reduzir o valor desejado, a sobrecolateralização ou o prazo.</div>` : ''}
+      <div class="sim-grid">
+        ${stat('Crédito liberado (cai na conta)', fmtBRL(resultado.valorLiberado))}
+        ${stat('Taxa de juros necessária', `${fmtPct(resultado.taxaJurosMensal,3)} a.m.<small>${fmtPct(resultado.taxaJurosAnual,1)} a.a.</small>`, true)}
+        ${stat('Valor do contrato (CCB)', fmtBRL(resultado.valorContrato))}
+        ${stat('Valor a pagar no vencimento', fmtBRL(resultado.valorAPagar))}
+        ${stat('Parcela equivalente', fmtBRL(resultado.pmt))}
+        ${stat('TIR ponderada resultante', fmtPct(resultado.tirPonderadaAnual,3))}
+      </div>
+    </section>`;
+  }
+
+  function cardTaxaComercial(taxaDesejadaMensal, resultado){
+    const titulo = `Taxa de ${fmtPct(taxaDesejadaMensal,3)} a.m.`;
+    if (!resultado || resultado.inviavel){
+      const msg = (resultado && resultado.motivo === 'baixo')
+        ? `Essa taxa é menor que o mínimo possível para este caso — o piso é <b class="num">${fmtPct(resultado.minimoPossivel,3)} a.m.</b> Suba a taxa pedida ou reveja os custos da operação.`
+        : 'Não foi possível encontrar uma taxa base que gere essa taxa contratada com os dados informados.';
+      return cardSimInviavel('Taxa comercial', titulo, msg);
+    }
+    const abaixoDoPiso = resultado.tirPonderadaAnual < PISO - 1e-9;
+    const capado = resultado.valorLiberado < resultado.valorLiberadoSemTeto - 0.005;
+    return `<section class="sim-card${abaixoDoPiso ? ' alerta' : ''}">
+      <div class="sim-head"><div><div class="sim-eyebrow">Taxa comercial</div><h3>${titulo}</h3></div>${pillPiso(resultado)}</div>
+      ${capado ? `<div class="sim-note">Teto aplicado ao crédito liberado — sem teto seria ${fmtBRL(resultado.valorLiberadoSemTeto)}.</div>` : ''}
+      ${abaixoDoPiso ? `<div class="sim-note">Essa taxa resulta em TIR ponderada de ${fmtPct(resultado.tirPonderadaAnual,2)} a.a., abaixo do piso de política (${fmtPct(PISO,0)}) — esta oferta não pode ser praticada nesta configuração.</div>` : ''}
+      <div class="sim-grid">
+        ${stat('Crédito liberado (cai na conta)', fmtBRL(resultado.valorLiberado), true)}
+        ${stat('Taxa de juros', `${fmtPct(resultado.taxaJurosMensal,3)} a.m.<small>${fmtPct(resultado.taxaJurosAnual,1)} a.a.</small>`)}
+        ${stat('Valor do contrato (CCB)', fmtBRL(resultado.valorContrato))}
+        ${stat('Valor a pagar no vencimento', fmtBRL(resultado.valorAPagar))}
+        ${stat('Parcela equivalente', fmtBRL(resultado.pmt))}
+        ${stat('TIR ponderada resultante', fmtPct(resultado.tirPonderadaAnual,3))}
+      </div>
+    </section>`;
   }
 
   function recalcular(){
@@ -1000,45 +1264,104 @@ function mesesAte(inicio, pagamento) {
     }
 
     const results = $('results');
+    const simWrap = $('sim-wrap');
     if (!(valor > 0) || !prazo){
+      results.classList.remove('quatro');
       results.innerHTML = TIERS.map(t => cardInviavel(t)).join('');
+      simWrap.innerHTML = '';
       return;
     }
 
     let tetoSel = $('in-teto').value;
     const teto = tetoSel === 'none' ? null : parseFloat(tetoSel);
 
+    const cenarios = cenariosPadrao(pct('in-inadimplencia'), pct('in-recuperabilidade'), Math.round(num('in-prazo-excussao')), pct('in-juros-mora'), pct('in-multa-mora'));
+    const premissas = montarPremissas();
+    const construirCalc = (corbanOverride) => new CalculadoraCredito({
+      custos: montarCustos(corbanOverride),
+      premissas,
+      cenarios,
+      tetoValorLiberado: teto,
+    });
+
     let calc;
     try {
-      calc = new CalculadoraCredito({
-        custos: montarCustos(),
-        premissas: montarPremissas(),
-        cenarios: cenariosPadrao(pct('in-inadimplencia'), pct('in-recuperabilidade'), Math.round(num('in-prazo-excussao')), pct('in-juros-mora'), pct('in-multa-mora')),
-        tetoValorLiberado: teto,
-      });
+      calc = construirCalc(undefined);
     } catch (e) {
       results.innerHTML = `<div class="offer inviavel"><div class="big-figure"><div class="label">Erro</div><div class="value" style="font-size:1rem">${esc(e.message)}</div></div></div>`;
+      simWrap.innerHTML = '';
       return;
     }
 
     // Preserva as memórias de cálculo abertas entre recálculos
     const abertos = new Set([...results.querySelectorAll('.offer')].filter(o => o.querySelector('details[open]')).map(o => o.dataset.tier));
 
-    results.innerHTML = TIERS.map(tier => {
+    const tiers = TIERS.slice();
+    const tirCustomPct = num('in-tir-custom');
+    if (tirCustomPct > 0){
+      tiers.push({ retorno: tirCustomPct / 100, tag: 'custom', nome: 'Oferta customizada', oferta: 'Sob medida', vigente: false, custom: true });
+    }
+    results.classList.toggle('quatro', tiers.length === 4);
+    results.innerHTML = tiers.map(tier => {
       let oferta = null;
-      try { oferta = calc.ofertar(valor, prazo, tier.retorno); } catch (e) { oferta = null; }
+      try {
+        // Tabelas da escada: corban travado por degrau; customizada: campo "Comissão do canal".
+        const calcTier = tier.corban === undefined ? calc : construirCalc(escadaComCanal ? tier.corban : 0);
+        oferta = calcTier.ofertar(valor, prazo, tier.retorno);
+      } catch (e) { oferta = null; }
       return oferta ? cardOferta(tier, oferta) : cardInviavel(tier);
     }).join('');
+
+    // Conta inversa e taxa comercial (opcionais)
+    let simHtml = '';
+    const valorDesejado = num('in-valor-desejado');
+    if (valorDesejado > 0){
+      const valorAlvo = teto != null ? Math.min(valorDesejado, teto) : valorDesejado;
+      let resultado = null;
+      try { resultado = calc.ofertarPorValorDesejado(valor, prazo, valorAlvo); } catch (e) { resultado = null; }
+      simHtml += cardContaInversa(valorDesejado, valorAlvo, resultado, teto);
+    }
+    const taxaComercialPct = num('in-taxa-comercial');
+    if (taxaComercialPct > 0){
+      let resultadoTaxa = null;
+      try { resultadoTaxa = calc.ofertarPorTaxaComercial(valor, prazo, taxaComercialPct / 100); } catch (e) { resultadoTaxa = null; }
+      simHtml += cardTaxaComercial(taxaComercialPct / 100, resultadoTaxa);
+    }
+    simWrap.innerHTML = simHtml;
 
     results.querySelectorAll('.offer').forEach(o => { if (abertos.has(o.dataset.tier)) { const d = o.querySelector('details'); if (d) d.open = true; } });
   }
 
-  ['in-nome','in-valor','in-prazo','in-data-base','in-data-pag','in-teto','in-hon-sucumb','in-hon-contr','in-canal',
-   'in-custas','in-spread','in-haircut','in-sobrecolat','in-inadimplencia','in-recuperabilidade','in-prazo-excussao',
+  ['in-nome','in-valor','in-prazo','in-data-base','in-data-pag','in-teto','in-sobrecolat','in-valor-desejado','in-taxa-comercial',
+   'in-tir-custom','in-hon-sucumb','in-hon-contr','in-canal',
+   'in-custas','in-spread','in-haircut','in-inadimplencia','in-recuperabilidade','in-prazo-excussao',
    'in-juros-mora','in-multa-mora','in-iof','in-com-artemis','in-cobranca-artemis','in-tac','in-custo-emissao',
    'in-franquia-emissao','in-volumetria','in-liq-pix','in-liq-ted','in-formalizacao','in-escrow-mensalidade',
    'in-meses-escrow','in-acompanhamento','in-boleto','in-evento-boleto','in-pct-eventos-boleto','in-cartorio'
   ].forEach(id => $(id).addEventListener('input', recalcular));
+
+  // Alternador Com canal / Sem canal da escada
+  const segCanalCom = $('seg-canal-com'), segCanalSem = $('seg-canal-sem');
+  const definirCanal = (com) => {
+    escadaComCanal = com;
+    segCanalCom.setAttribute('aria-pressed', String(com));
+    segCanalSem.setAttribute('aria-pressed', String(!com));
+    recalcular();
+  };
+  segCanalCom.addEventListener('click', () => definirCanal(true));
+  segCanalSem.addEventListener('click', () => definirCanal(false));
+
+  // Steppers de ajuste rápido (ex.: sobrecolateralização)
+  document.querySelectorAll('.step-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = $(btn.dataset.stepTarget);
+      const step = parseFloat(btn.dataset.step);
+      const atual = parseFloat(target.value) || 0;
+      const min = target.min !== '' ? parseFloat(target.min) : -Infinity;
+      target.value = Math.max(min, atual + step);
+      recalcular();
+    });
+  });
 
   // Tema claro/escuro
   const btnTema = $('theme-toggle');
@@ -1059,7 +1382,7 @@ function mesesAte(inicio, pagamento) {
   // Estado inicial: caso ilustrativo de exemplo — substitua pelos dados do caso real.
   const hoje = new Date();
   const daqui12m = new Date(hoje.getFullYear(), hoje.getMonth()+12, hoje.getDate());
-  const toISO = (d) => d.toISOString().slice(0,10);
+  const toISO = (d) => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
   $('in-data-base').value = toISO(hoje);
   $('in-data-pag').value = toISO(daqui12m);
 
