@@ -211,6 +211,23 @@
   .step-btn:active{transform:scale(.95)}
   .step-btn:focus-visible{outline:none; box-shadow:0 0 0 4px var(--ring)}
 
+  /* Modo PMT */
+  .seg-modo{width:100%}
+  .seg-modo button{flex:1; white-space:nowrap}
+  .pmt-box{border:1px dashed var(--border-strong); border-radius:12px; padding:14px 14px 4px; margin:0 0 14px; background:var(--surface-2)}
+  .pmt-box .field input, .pmt-box .field select{background:var(--surface)}
+  .chk{display:flex; gap:10px; align-items:flex-start; font-size:.82rem; line-height:1.45; margin:0 0 14px; cursor:pointer}
+  .chk input{width:18px; height:18px; margin:1px 0 0; flex:none; accent-color:var(--d20-escuro); cursor:pointer}
+  .chk small{display:block; color:var(--muted); font-size:.74rem}
+  .field input:disabled{opacity:.55; cursor:not-allowed}
+  .step-btn:disabled{opacity:.45; cursor:not-allowed}
+  .tag-modo{
+    font-family:"Inter", sans-serif; font-size:.66rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--accent); background:var(--accent-soft); border-radius:999px; padding:3px 9px; margin-left:2px;
+  }
+  .offer-head > div:first-child{min-width:0}
+  .alertas{display:flex; flex-wrap:wrap; gap:5px; margin-top:8px}
+
   /* Simulações opcionais */
   .opt-group{margin:4px 0 6px; padding-top:14px; border-top:1px solid var(--border)}
   .opt-title{font-size:.7rem; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:12px}
@@ -222,6 +239,7 @@
     display:flex; flex-direction:column; gap:12px;
   }
   .sim-card.inviavel, .sim-card.alerta{border-left-color:var(--warn-border)}
+  .sim-note.sim-info{color:var(--text); background:var(--surface-2); border-color:var(--border)}
   .sim-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap}
   .sim-eyebrow{font-size:.7rem; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--accent)}
   .sim-head h3{font-size:1rem; font-weight:600; margin-top:2px}
@@ -347,7 +365,7 @@
       </button>
     </div>
     <div class="hero">
-      <div class="eyebrow">Legal Equity · CCB Bullet</div>
+      <div class="eyebrow" id="eyebrow-modo">Legal Equity · CCB Bullet</div>
       <h1>Calculadora Legal Equity</h1>
     </div>
   </div>
@@ -365,6 +383,15 @@
   <div class="layout">
     <section class="card" id="panel-inputs" aria-labelledby="t-inputs">
       <h2 class="panel-title" id="t-inputs"><span class="bar"></span>Dados do caso</h2>
+
+      <div class="field">
+        <span class="label" id="lbl-modo">Modo da CCB</span>
+        <div class="seg seg-modo" role="group" aria-labelledby="lbl-modo">
+          <button type="button" id="seg-modo-bullet" aria-pressed="true">Bullet</button>
+          <button type="button" id="seg-modo-pmt" aria-pressed="false">PMT · parcelado</button>
+        </div>
+        <div class="hint" id="modo-hint">Pagamento único no vencimento. Inadimplência padrão 95%.</div>
+      </div>
 
       <div class="field">
         <label for="in-nome">Identificação do caso <span style="color:var(--muted);font-weight:400">(opcional)</span></label>
@@ -430,6 +457,40 @@
           <button type="button" class="step-btn" data-step-target="in-sobrecolat" data-step="5" aria-label="Aumentar sobrecolateralização">+</button>
         </div>
         <div class="hint">Garantia exigida sobre o VP do reclamante. Baixar aumenta o crédito liberado (e o risco); subir reduz os dois.</div>
+      </div>
+
+      <div class="pmt-box" id="pmt-fields" hidden>
+        <div class="opt-title">Parâmetros do modo PMT</div>
+        <div class="row2">
+          <div class="field">
+            <label for="in-pmt-media">PMTs pagas até inadimplir</label>
+            <input type="number" id="in-pmt-media" class="num" min="0" step="1" value="4">
+          </div>
+          <div class="field">
+            <label for="in-pmt-carencia">Carência (meses)</label>
+            <input type="number" id="in-pmt-carencia" class="num" min="0" step="1" value="0">
+          </div>
+        </div>
+        <div class="field">
+          <label for="in-pmt-prazo-ccb">Prazo da CCB</label>
+          <div class="input-affix">
+            <input type="number" id="in-pmt-prazo-ccb" class="has-suf num" min="1" step="1" placeholder="igual ao prazo do caso">
+            <span class="affix suf">m</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="in-pmt-sobre">Sobrecolateralização no PMT</label>
+          <select id="in-pmt-sobre">
+            <option value="fixa" selected>Fixa (campo acima)</option>
+            <option value="liquido">Resulta do valor desejado</option>
+          </select>
+          <div class="hint">"Resulta do valor desejado" é o modo da planilha: o crédito liberado fica fixo no valor desejado e a sobrecolateralização sai como resultado de cada oferta.</div>
+        </div>
+        <label class="chk" for="in-pmt-teto">
+          <input type="checkbox" id="in-pmt-teto" checked>
+          <span>Limitar a recuperação na excussão pela garantia <small>(mesmo teto do Bullet, decisão de 01/10/2026; a planilha não limita)</small></span>
+        </label>
+        <div id="warn-pmt" class="warn-inline" role="alert" hidden></div>
       </div>
 
       <div class="row2">
@@ -633,7 +694,7 @@
       <div id="sim-wrap"></div>
       <div class="card" style="padding:18px 18px 20px">
         <div class="escada-head">
-          <h2 class="panel-title" id="t-results"><span class="bar"></span>Escada de ofertas<small>TIR ponderada a.a.</small></h2>
+          <h2 class="panel-title" id="t-results"><span class="bar"></span>Escada de ofertas<span class="tag-modo" id="tag-modo" hidden>CCB PMT</span><small>TIR ponderada a.a.</small></h2>
           <div class="seg" role="group" aria-label="Comissão de canal na escada">
             <button type="button" id="seg-canal-com" aria-pressed="true" title="Verde 10% · Azul 8% · Preta 6%">Com canal</button>
             <button type="button" id="seg-canal-sem" aria-pressed="false">Sem canal</button>
@@ -1002,6 +1063,251 @@ class CalculadoraCredito {
   }
 }
 
+// ===== Modo CCB PMT: porte da aba "CCB PMT" do Simulador de Ofertas (17.09.26-01) =====
+// Depende de: CustosCredito, PremissasCaso, raiz, tirMensal, anualizar (motor Bullet, mesmo escopo).
+
+// RATE do Excel: taxa r tal que contrato = parcela * (1 - (1+r)^-n) / r.
+function taxaPrice(contrato, parcela, n) {
+  const f = (r) => contrato - parcela * (1 - Math.pow(1 + r, -n)) / r;
+  return raiz(f, 1e-9, 20.0);
+}
+
+class PremissasPMT {
+  constructor(opts = {}) {
+    this.inadimplencia = opts.inadimplencia ?? 0.50;      // F94
+    this.recuperabilidade = opts.recuperabilidade ?? 0.50; // F95 (sobre a inadimplência)
+    this.mediaPmtsInadimplencia = opts.mediaPmtsInadimplencia ?? 4; // F96 (fixa na planilha)
+    this.prazoExcussao = opts.prazoExcussao ?? 6;          // F64
+    this.jurosMora = opts.jurosMora ?? 0.01;               // F68
+    this.multaMora = opts.multaMora ?? 0.02;               // F69
+    this.carencia = opts.carencia ?? 0;                    // F65
+    // Travado por Gabriel em 01/10/2026: mesmo teto de garantia do Bullet na excussão.
+    // false = comportamento literal da planilha (sem teto, §4.4).
+    this.tetoGarantia = opts.tetoGarantia ?? true;
+  }
+}
+
+class CalculadoraPMT {
+  constructor(opts = {}) {
+    // Padrões da aba CCB PMT: volumetria 300 (F60) e escrow R$ 49,90 (F85).
+    this.custos = opts.custos ?? new CustosCredito({ volumetriaMensal: 300, uy3EscrowMensalidade: 49.9 });
+    this.pmt = opts.pmt ?? new PremissasPMT();
+    this.premissas = opts.premissas ?? new PremissasCaso({ honorariosSucumbencia: 0.025, honorariosContratuais: 0.40, sobrecolateralizacao: 1.0 });
+    this.tetoValorLiberado = opts.tetoValorLiberado === undefined ? 25000.0 : opts.tetoValorLiberado;
+  }
+
+  // Valor do reclamante e VP (F47, F48). prazoCaso desconta o VP; i = TIR do fluxo performado (F67).
+  base(valorBruto, prazoCaso, i) {
+    const p = this.premissas;
+    const valorReclamante = valorBruto * (1 - p.honorariosContratuais - p.custasProcessuais - p.honorariosSucumbencia);
+    const vpReclamante = valorReclamante / Math.pow((1 + i) * (1 + p.spreadRisco), prazoCaso) * (1 - p.haircut);
+    return { valorReclamante, vpReclamante };
+  }
+
+  // VPL dos custos (G74:G92) descontado a i, prazo da CCB n.
+  vplCustos(C, n, i) {
+    const k = this.custos;
+    const desconto = Math.pow(1 + i, n);
+    const E = k.mesesEscrow(n);
+    const anuidade = (meses) => (1 - Math.pow(1 + i, -meses)) / i;
+    return (
+      C * (k.comissaoCorban + k.comissaoArtemis)
+      + C * k.cobrancaArtemis
+      + k.tac * C / desconto
+      + k.custoEmissao(C)
+      + k.liquidacao
+      + k.uy3Formalizacao
+      + k.uy3EscrowMensalidade * anuidade(E) / Math.pow(1 + i, n - E)
+      + (k.transferenciaEscrow + k.uy3Boleto + k.uy3EventoBoleto * k.uy3PctEventosBoleto) / desconto
+      + k.acompanhamentoMensal * anuidade(n)
+    );
+  }
+
+  // Simula o caso. opts.contratoFixo: fixa o valor da CCB (modo da planilha, onde F57 resolve a sobrecolateralização).
+  simular(valorBruto, prazoCaso, i, opts = {}) {
+    const k = this.custos, q = this.pmt, p = this.premissas;
+    const n = opts.prazoEmprestimo ?? prazoCaso;          // F63 (planilha: = prazo do caso)
+    const car = q.carencia;
+    const m = Math.min(q.mediaPmtsInadimplencia, n);
+    const X = q.prazoExcussao;
+    const { valorReclamante, vpReclamante } = this.base(valorBruto, prazoCaso, i);
+    const C = opts.contratoFixo !== undefined ? opts.contratoFixo : vpReclamante / (1 + p.sobrecolateralizacao);
+    const sobrecolBruta = vpReclamante / C - 1;
+    const vplc = this.vplCustos(C, n, i);
+    const P = (C + vplc) * i / (1 - Math.pow(1 + i, -n)) * Math.pow(1 + i, car); // F71
+    const r = taxaPrice(C, P, n);                                                  // F70
+    const garantia = valorReclamante * (1 - p.haircut);
+    const emissao = k.custoEmissao(C);
+    const E = k.mesesEscrow(n);
+    const fimExc = m + X;
+    const lenCasos = Math.max(fimExc, n) + 1;
+
+    // Saldo de principal ao fim da média de PMTs (linha 138 da planilha, valor lido por XLOOKUP).
+    let princ = C, aberto = C, jurosAcum = 0;
+    for (let mes = 1; mes <= m; mes++) {
+      const pag = mes > car ? P : 0;
+      const juros = aberto * r + jurosAcum;
+      const amort = pag > juros ? pag - juros : 0;
+      const abertoNovo = aberto * (1 + r) - pag;
+      princ -= amort;
+      jurosAcum = abertoNovo - princ;
+      aberto = abertoNovo;
+    }
+    const saldoMedia = princ;
+    const vencido = P * X;
+    const mora = vencido * q.multaMora + P * q.jurosMora * (X * (X + 1)) / 2;
+    const excussaoBruta = saldoMedia * Math.pow(1 + r, X) + mora;
+    const excussaoRecebida = q.tetoGarantia ? Math.min(excussaoBruta, garantia) : excussaoBruta;
+
+    const saidaInicial = () => -(C * (1 + k.comissaoCorban + k.comissaoArtemis)) - emissao - k.liquidacao - k.uy3Formalizacao;
+    const montar = (nome, len, inflow, fimCusto, mesTac, fimBoleto) => {
+      const f = new Array(len).fill(0.0);
+      f[0] += saidaInicial();
+      for (let mes = 0; mes < len; mes++) {
+        const entrada = inflow(mes);
+        f[mes] += entrada;
+        if (entrada > 0) f[mes] -= entrada * k.cobrancaArtemis;                      // linhas 118/152/184
+        if (mes >= 1 && mes <= fimCusto) {
+          f[mes] -= k.acompanhamentoMensal;                                           // linhas 128/162/194
+          if (mes > fimCusto - E) f[mes] -= k.uy3EscrowMensalidade;                   // linhas 123/157/189
+        }
+        if (mes === mesTac) f[mes] -= C * k.tac;                                      // linhas 119/153/185
+        if (mes === n) f[mes] -= k.transferenciaEscrow;                               // linhas 124/158/190
+        if (mes > car && mes <= fimBoleto) f[mes] -= k.uy3Boleto;                     // linhas 125/159/191
+        if (mes > car && mes <= n) f[mes] -= k.uy3EventoBoleto * k.uy3PctEventosBoleto; // linhas 126/160/192
+      }
+      return f;
+    };
+
+    const fluxos = {};
+    fluxos.performado = montar('performado', n + 1, (mes) => (mes <= car || mes > n || mes === 0) ? 0 : P, n, n, n);
+    fluxos.excussao = montar('excussao', lenCasos, (mes) => {
+      if (mes === fimExc) return excussaoRecebida;
+      return (mes <= car || mes > m || mes === 0) ? 0 : P;
+    }, fimExc, fimExc, fimExc);
+    fluxos.inadimplido = montar('inadimplido', lenCasos, (mes) => {
+      if (mes === fimExc) return 0;
+      return (mes <= car || mes > m || mes === 0) ? 0 : P;
+    }, fimExc, -1, fimExc);
+
+    const w = { performado: 1 - q.inadimplencia, excussao: q.recuperabilidade * q.inadimplencia };
+    w.inadimplido = 1 - w.performado - w.excussao;
+    const tamanho = Math.max(...Object.values(fluxos).map((f) => f.length));
+    const ponderado = new Array(tamanho).fill(0.0);
+    for (const nome of Object.keys(fluxos)) {
+      const f = fluxos[nome];
+      for (let mes = 0; mes < f.length; mes++) ponderado[mes] += w[nome] * f[mes];
+    }
+    const tirPonderadaMensal = tirMensal(ponderado);
+    const tirs = {};
+    for (const nome of Object.keys(fluxos)) tirs[nome] = anualizar(tirMensal(fluxos[nome]));
+
+    return {
+      i, C, P, r, n, m, X, prazoCaso,
+      valorReclamante, vpReclamante, sobrecolBruta,
+      sobrecolLiquida: vpReclamante / (C * (1 - k.deducoesLiberacao)) - 1,
+      custosVpl: vplc,
+      garantia, saldoMedia, mora, excussaoBruta, excussaoRecebida,
+      coberturaExcussao: excussaoBruta / garantia,
+      valorLiberado: C * (1 - k.deducoesLiberacao),
+      pesos: w, fluxos, fluxoPonderado: ponderado, tirs,
+      tirPonderadaMensal,
+      get tirPonderadaAnual() { return anualizar(tirPonderadaMensal); },
+    };
+  }
+
+  // Maior i com resposta finita (a taxa i alta zera a CCB e o RATE/TIR deixam de existir).
+  _tetoBusca(g) {
+    let hi = 1.0;
+    while (hi > 1e-3 && !Number.isFinite(g(hi))) hi /= 2;
+    return hi;
+  }
+
+  // Monta a oferta a partir de uma simulação (aplica o teto comercial escalando a CCB na mesma taxa, como no Bullet).
+  _oferta(sim, extra) {
+    let valorLiberado = sim.valorLiberado, C = sim.C, P = sim.P;
+    if (this.tetoValorLiberado !== null && valorLiberado > this.tetoValorLiberado) {
+      const f = this.tetoValorLiberado / valorLiberado;
+      valorLiberado = this.tetoValorLiberado; C = sim.C * f; P = sim.P * f;
+    }
+    return Object.assign({
+      modo: 'pmt',
+      prazoMeses: sim.n,
+      prazoCaso: sim.prazoCaso,
+      taxaJurosMensal: sim.r,
+      taxaJurosAnual: anualizar(sim.r),
+      valorContrato: C,
+      valorLiberado,
+      valorLiberadoSemTeto: sim.valorLiberado,
+      parcela: P,
+      pmt: P,
+      valorAPagar: P * sim.n,
+      tirPerformadoMensal: sim.i,
+      tirPonderadaAnual: sim.tirPonderadaAnual,
+      simulacao: sim,
+    }, extra);
+  }
+
+  // Oferta por retorno-alvo (TIR ponderada anual), sobrecolateralização livre.
+  ofertar(valorBruto, prazoCaso, retornoAlvo, opts = {}) {
+    const erro = (i) => this.simular(valorBruto, prazoCaso, i, opts).tirPonderadaAnual - retornoAlvo;
+    const minimo = 1e-6;
+    const maximo = this._tetoBusca(erro);
+    const i = raiz(erro, minimo, maximo);
+    if (Number.isNaN(i)) return null;
+    const sim = this.simular(valorBruto, prazoCaso, i, opts);
+    if (!(sim.valorLiberado > 0)) return null;
+    return this._oferta(sim, { retornoAlvo, valorBruto });
+  }
+
+  ofertas(valorBruto, prazoCaso, retornos = [0.5, 0.4, 0.3], opts = {}) {
+    const out = {};
+    for (const r of retornos) out[r] = this.ofertar(valorBruto, prazoCaso, r, opts);
+    return out;
+  }
+
+  // Modo da planilha: valor líquido fixo (F57/F58); a sobrecolateralização resulta e a taxa i fecha o retorno-alvo.
+  ofertarPorLiquidoFixo(valorBruto, prazoCaso, valorLiquido, retornoAlvo, opts = {}) {
+    const C = valorLiquido / (1 - this.custos.deducoesLiberacao);
+    const o = Object.assign({}, opts, { contratoFixo: C });
+    const erro = (i) => this.simular(valorBruto, prazoCaso, i, o).tirPonderadaAnual - retornoAlvo;
+    const maximo = this._tetoBusca(erro);
+    const i = raiz(erro, 1e-6, maximo);
+    if (Number.isNaN(i)) return null;
+    const sim = this.simular(valorBruto, prazoCaso, i, o);
+    return this._oferta(sim, { retornoAlvo, valorBruto, valorLiquidoFixo: valorLiquido });
+  }
+
+  // Conta inversa: valor que deve cair na conta; devolve a TIR resultante (sobrecolateralização livre/fixa).
+  ofertarPorValorDesejado(valorBruto, prazoCaso, valorDesejado, opts = {}) {
+    const erro = (i) => this.simular(valorBruto, prazoCaso, i, opts).valorLiberado - valorDesejado;
+    const minimo = 1e-6;
+    const simMin = this.simular(valorBruto, prazoCaso, minimo, opts);
+    if (!(simMin.valorLiberado >= valorDesejado)) return { inviavel: true, motivo: 'alto', maximoPossivel: simMin.valorLiberado };
+    const maximo = 1.0;
+    if (erro(maximo) > 0) return { inviavel: true, motivo: 'baixo', maximoPossivel: null };
+    const i = raiz(erro, minimo, maximo);
+    if (Number.isNaN(i)) return { inviavel: true, motivo: 'erro', maximoPossivel: null };
+    const sim = this.simular(valorBruto, prazoCaso, i, opts);
+    return Object.assign(this._oferta(sim, { valorDesejado, valorBruto }), { inviavel: false });
+  }
+
+  // Taxa comercial direta: acha o i que produz a taxa contratada (RATE) desejada.
+  ofertarPorTaxaComercial(valorBruto, prazoCaso, taxaDesejadaMensal, opts = {}) {
+    const erro = (i) => this.simular(valorBruto, prazoCaso, i, opts).r - taxaDesejadaMensal;
+    const minimo = 1e-6;
+    const simMin = this.simular(valorBruto, prazoCaso, minimo, opts);
+    if (!(simMin.r <= taxaDesejadaMensal)) return { inviavel: true, motivo: 'baixo', minimoPossivel: simMin.r };
+    const maximo = this._tetoBusca(erro);
+    if (erro(maximo) < 0) return { inviavel: true, motivo: 'alto', minimoPossivel: null };
+    const i = raiz(erro, minimo, maximo);
+    if (Number.isNaN(i)) return { inviavel: true, motivo: 'erro', minimoPossivel: null };
+    const sim = this.simular(valorBruto, prazoCaso, i, opts);
+    if (!(sim.valorLiberado > 0)) return { inviavel: true, motivo: 'erro', minimoPossivel: null };
+    return Object.assign(this._oferta(sim, { taxaDesejadaMensal, valorBruto }), { inviavel: false });
+  }
+}
+
 function ultimoDeFevereiro(d) {
   const next = new Date(d.getTime()); next.setDate(next.getDate() + 1);
   return d.getMonth() === 1 && next.getMonth() === 2;
@@ -1106,23 +1412,59 @@ function mesesAte(inicio, pagamento) {
     { retorno: 0.3, tag: 'preta', nome: 'Tabela Preta', oferta: 'Oferta Mínima', vigente: true, corban: 0.06 },
   ];
   let escadaComCanal = true;
+  let modoCCB = 'bullet';
   const corbanDoTier = (tier) => tier.corban === undefined ? pct('in-canal') : (escadaComCanal ? tier.corban : 0);
 
   const PISO = TIERS[TIERS.length - 1].retorno; // piso de política = Tabela Preta (30%)
 
   const chev = '<svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>';
 
-  function cabecalho(tier, abaixoDoPiso){
+  function cabecalho(tier, abaixoDoPiso, alertaSobrecol){
     return `<div class="offer-head">
         <div>
           <span class="tier-tag"><span class="dot"></span>${tier.nome}</span>
           <h3>${tier.oferta} <span class="tir"><span class="sep">· </span>TIR ${fmtPct(tier.retorno,0)}<span class="canal"> · canal ${fmtPct(corbanDoTier(tier),0)}</span></span></h3>
+          ${abaixoDoPiso || alertaSobrecol ? `<div class="alertas">
+            ${abaixoDoPiso ? '<span class="piso-badge">Abaixo do piso</span>' : ''}
+            ${alertaSobrecol ? `<span class="piso-badge">${alertaSobrecol}</span>` : ''}
+          </div>` : ''}
         </div>
-        ${abaixoDoPiso ? '<span class="piso-badge">Abaixo do piso</span>'
-          : tier.vigente ? '<span class="vigente-badge">Vigente</span>'
+        ${tier.vigente ? '<span class="vigente-badge">Vigente</span>'
           : tier.custom ? '<span class="alcada-badge">Sob medida</span>'
           : '<span class="alcada-badge">Alçada</span>'}
       </div>`;
+  }
+
+  function linhasPagamento(o){
+    if (o.modo === 'pmt') {
+      return `<div class="kv"><span class="k">Parcela mensal (PMT)</span><span class="v num">${fmtBRL(o.parcela)} × ${o.prazoMeses}</span></div>
+        <div class="kv"><span class="k">Total pago em ${o.prazoMeses} parcelas</span><span class="v num">${fmtBRL(o.valorAPagar)}</span></div>`;
+    }
+    return `<div class="kv"><span class="k">Valor a pagar no vencimento</span><span class="v num">${fmtBRL(o.valorAPagar)}</span></div>
+        <div class="kv"><span class="k">Parcela equivalente (se amortizado)</span><span class="v num">${fmtBRL(o.pmt)}</span></div>`;
+  }
+
+  function statsPagamento(o){
+    if (o.modo === 'pmt') {
+      return stat('Parcela mensal (PMT)', `${fmtBRL(o.parcela)} × ${o.prazoMeses}`) + stat(`Total pago em ${o.prazoMeses} parcelas`, fmtBRL(o.valorAPagar));
+    }
+    return stat('Valor a pagar no vencimento', fmtBRL(o.valorAPagar)) + stat('Parcela equivalente', fmtBRL(o.pmt));
+  }
+
+  function memoriaPMT(o){
+    const sim = o.simulacao, w = sim.pesos, t = sim.tirs;
+    const tir = (x) => Number.isFinite(x) ? fmtPct(x, 1) : 'perda total';
+    return `
+          <div class="kv"><span class="k">Prazo do caso · prazo da CCB</span><span class="v num">${o.prazoCaso} · ${sim.n} meses</span></div>
+          <div class="kv"><span class="k">Sobrecolateralização sobre o contrato</span><span class="v num">${fmtPct(sim.sobrecolBruta,1)}</span></div>
+          <div class="kv"><span class="k">Sobrecolateralização sobre o líquido</span><span class="v num">${fmtPct(sim.sobrecolLiquida,1)}</span></div>
+          <div class="kv"><span class="k">Cenário performado (${fmtPct(w.performado,0)})</span><span class="v num">${Number.isFinite(t.performado) ? 'TIR ' + tir(t.performado) + ' a.a.' : 'perda total'}</span></div>
+          <div class="kv"><span class="k">Cenário excussão (${fmtPct(w.excussao,0)})</span><span class="v num">TIR ${tir(t.excussao)} a.a.</span></div>
+          <div class="kv"><span class="k">Cenário inadimplido (${fmtPct(w.inadimplido,0)})</span><span class="v num">TIR ${tir(t.inadimplido)} a.a.</span></div>
+          <div class="kv"><span class="k">Saldo de principal após ${sim.m} PMTs</span><span class="v num">${fmtBRL(sim.saldoMedia)}</span></div>
+          <div class="kv"><span class="k">Mora e multa em ${sim.X} meses</span><span class="v num">${fmtBRL(sim.mora)}</span></div>
+          <div class="kv"><span class="k">Excussão: saldo composto + encargos</span><span class="v num">${fmtBRL(sim.excussaoBruta)}</span></div>
+          <div class="kv"><span class="k">Excussão: recebido (após teto de garantia)</span><span class="v num">${fmtBRL(sim.excussaoRecebida)}</span></div>`;
   }
 
   function cardInviavel(tier){
@@ -1137,8 +1479,12 @@ function mesesAte(inicio, pagamento) {
     const capado = oferta.valorLiberado < oferta.valorLiberadoSemTeto - 0.005;
     const abaixoDoPiso = oferta.tirPonderadaAnual < PISO - 1e-9;
     const sim = oferta.simulacao;
+    const liquidoFixo = oferta.valorLiquidoFixo != null;
+    const alertaSobrecol = !liquidoFixo ? ''
+      : sim.sobrecolBruta < 0 ? 'Contrato acima do VP: inviável'
+      : sim.sobrecolBruta < 0.5 - 1e-9 ? 'Sobrecol. abaixo de 50%' : '';
     return `<article class="offer${tier.vigente ? ' vigente' : ''}${abaixoDoPiso ? ' abaixo-piso' : ''}" data-tier="${tier.tag}">
-      ${cabecalho(tier, abaixoDoPiso)}
+      ${cabecalho(tier, abaixoDoPiso, alertaSobrecol)}
 
       <div class="big-figure">
         <div class="label">Crédito liberado (cai na conta)</div>
@@ -1150,8 +1496,8 @@ function mesesAte(inicio, pagamento) {
       <div class="kv-list">
         <div class="kv"><span class="k">Taxa de juros</span><span class="v num">${fmtPct(oferta.taxaJurosMensal,3)} a.m.<small>${fmtPct(oferta.taxaJurosAnual,1)} a.a.</small></span></div>
         <div class="kv"><span class="k">Valor do contrato (CCB)</span><span class="v num">${fmtBRL(oferta.valorContrato)}</span></div>
-        <div class="kv"><span class="k">Valor a pagar no vencimento</span><span class="v num">${fmtBRL(oferta.valorAPagar)}</span></div>
-        <div class="kv"><span class="k">Parcela equivalente (se amortizado)</span><span class="v num">${fmtBRL(oferta.pmt)}</span></div>
+        ${linhasPagamento(oferta)}
+        ${liquidoFixo ? `<div class="kv"><span class="k">Sobrecolateralização resultante</span><span class="v num">${fmtPct(sim.sobrecolBruta,1)}</span></div>` : ''}
         <div class="kv"><span class="k">TIR ponderada conferida</span><span class="v num">${fmtPct(oferta.tirPonderadaAnual,3)}</span></div>
       </div>
 
@@ -1162,7 +1508,8 @@ function mesesAte(inicio, pagamento) {
           <div class="kv"><span class="k">VP do reclamante (garantia descontada)</span><span class="v num">${fmtBRL(sim.vpReclamante)}</span></div>
           <div class="kv"><span class="k">TIR do fluxo performado</span><span class="v num">${fmtPct(oferta.tirPerformadoMensal,3)} a.m.</span></div>
           <div class="kv"><span class="k">VPL dos custos da operação</span><span class="v num">${fmtBRL(sim.custosVpl)}</span></div>
-          <div class="kv"><span class="k">Garantia (teto de excussão)</span><span class="v num">${fmtBRL(sim.contrato.garantia)}</span></div>
+          <div class="kv"><span class="k">Garantia (teto de excussão)</span><span class="v num">${fmtBRL(oferta.modo === 'pmt' ? sim.garantia : sim.contrato.garantia)}</span></div>
+          ${oferta.modo === 'pmt' ? memoriaPMT(oferta) : ''}
         </div>
       </details>
     </article>`;
@@ -1177,7 +1524,7 @@ function mesesAte(inicio, pagamento) {
       <div><div class="k">${nome ? esc(nome) : 'Valor da condenação'}</div><div class="v num">${valor > 0 ? fmtBRL(valor) : '—'}</div></div>
       <div><div class="k">Prazo</div><div class="v num">${prazo ? prazo + (prazo === 1 ? ' mês' : ' meses') : '—'}</div></div>
       <div><div class="k">Teto liberado</div><div class="v num">${tetoTxt}</div></div>
-      <div><div class="k">Sobrecolateralização</div><div class="v num">${isFinite(num('in-sobrecolat')) ? num('in-sobrecolat').toLocaleString('pt-BR') + '%' : '—'}</div></div>
+      <div><div class="k">Sobrecolateralização</div><div class="v num">${(modoCCB === 'pmt' && $('in-pmt-sobre').value === 'liquido' && num('in-valor-desejado') > 0) ? 'Resultante' : isFinite(num('in-sobrecolat')) ? num('in-sobrecolat').toLocaleString('pt-BR') + '%' : '—'}</div></div>
       <div><div class="k">Canal na escada</div><div class="v num">${canal}</div></div>`;
   }
 
@@ -1218,10 +1565,17 @@ function mesesAte(inicio, pagamento) {
         ${stat('Crédito liberado (cai na conta)', fmtBRL(resultado.valorLiberado))}
         ${stat('Taxa de juros necessária', `${fmtPct(resultado.taxaJurosMensal,3)} a.m.<small>${fmtPct(resultado.taxaJurosAnual,1)} a.a.</small>`, true)}
         ${stat('Valor do contrato (CCB)', fmtBRL(resultado.valorContrato))}
-        ${stat('Valor a pagar no vencimento', fmtBRL(resultado.valorAPagar))}
-        ${stat('Parcela equivalente', fmtBRL(resultado.pmt))}
+        ${statsPagamento(resultado)}
         ${stat('TIR ponderada resultante', fmtPct(resultado.tirPonderadaAnual,3))}
       </div>
+    </section>`;
+  }
+
+  function cardLiquidoFixo(valorLiquidoFixo, valorDesejado){
+    const capado = valorLiquidoFixo < valorDesejado - 0.005;
+    return `<section class="sim-card">
+      <div class="sim-head"><div><div class="sim-eyebrow">Líquido fixo · PMT</div><h3>${fmtBRL(valorLiquidoFixo)} na conta${capado ? ' <span class="capado">(limitado ao teto)</span>' : ''}</h3></div></div>
+      <div class="sim-note sim-info">Cada oferta abaixo entrega exatamente este valor na conta. A sobrecolateralização é o resultado de cada degrau, na taxa que fecha a TIR-alvo.</div>
     </section>`;
   }
 
@@ -1243,8 +1597,7 @@ function mesesAte(inicio, pagamento) {
         ${stat('Crédito liberado (cai na conta)', fmtBRL(resultado.valorLiberado), true)}
         ${stat('Taxa de juros', `${fmtPct(resultado.taxaJurosMensal,3)} a.m.<small>${fmtPct(resultado.taxaJurosAnual,1)} a.a.</small>`)}
         ${stat('Valor do contrato (CCB)', fmtBRL(resultado.valorContrato))}
-        ${stat('Valor a pagar no vencimento', fmtBRL(resultado.valorAPagar))}
-        ${stat('Parcela equivalente', fmtBRL(resultado.pmt))}
+        ${statsPagamento(resultado)}
         ${stat('TIR ponderada resultante', fmtPct(resultado.tirPonderadaAnual,3))}
       </div>
     </section>`;
@@ -1275,14 +1628,65 @@ function mesesAte(inicio, pagamento) {
     let tetoSel = $('in-teto').value;
     const teto = tetoSel === 'none' ? null : parseFloat(tetoSel);
 
-    const cenarios = cenariosPadrao(pct('in-inadimplencia'), pct('in-recuperabilidade'), Math.round(num('in-prazo-excussao')), pct('in-juros-mora'), pct('in-multa-mora'));
+    const ehPMT = modoCCB === 'pmt';
+    const cenarios = ehPMT ? null : cenariosPadrao(pct('in-inadimplencia'), pct('in-recuperabilidade'), Math.round(num('in-prazo-excussao')), pct('in-juros-mora'), pct('in-multa-mora'));
     const premissas = montarPremissas();
-    const construirCalc = (corbanOverride) => new CalculadoraCredito({
-      custos: montarCustos(corbanOverride),
-      premissas,
-      cenarios,
-      tetoValorLiberado: teto,
-    });
+
+    // PMT: parâmetros próprios + avisos da planilha (checagem F34: prazo do caso <= prazo da CCB + excussão)
+    const optsPMT = {};
+    const warnPmt = $('warn-pmt');
+    let liquidoFixo = false, valorLiquidoFixo = null;
+    if (ehPMT) {
+      const prazoCcbIn = num('in-pmt-prazo-ccb');
+      if (Number.isFinite(prazoCcbIn) && prazoCcbIn >= 1) optsPMT.prazoEmprestimo = Math.round(prazoCcbIn);
+      const prazoCcb = optsPMT.prazoEmprestimo ?? prazo;
+      const exc = Math.round(num('in-prazo-excussao')) || 0;
+      const media = Number.isFinite(num('in-pmt-media')) ? Math.round(num('in-pmt-media')) : 4;
+      const car = Number.isFinite(num('in-pmt-carencia')) ? Math.max(0, Math.round(num('in-pmt-carencia'))) : 0;
+      const avisos = [];
+      if (prazo > prazoCcb + exc) avisos.push('Revisar: o prazo do caso (' + prazo + ') passa do prazo da CCB mais a excussão (' + (prazoCcb + exc) + ').');
+      if (media > prazoCcb) avisos.push('PMTs pagas até inadimplir (' + media + ') maior que o prazo da CCB: o motor usa ' + prazoCcb + '.');
+      if (car >= prazoCcb) avisos.push('A carência precisa ser menor que o prazo da CCB.');
+      warnPmt.hidden = avisos.length === 0;
+      warnPmt.textContent = avisos.join(' ');
+      const vd = num('in-valor-desejado');
+      liquidoFixo = $('in-pmt-sobre').value === 'liquido' && vd > 0;
+      if (liquidoFixo) valorLiquidoFixo = teto != null ? Math.min(vd, teto) : vd;
+    } else {
+      warnPmt.hidden = true;
+    }
+    $('in-sobrecolat').disabled = liquidoFixo;
+    document.querySelectorAll('.step-btn[data-step-target="in-sobrecolat"]').forEach(b => { b.disabled = liquidoFixo; });
+
+    const construirCalc = (corbanOverride) => {
+      if (ehPMT) {
+        return new CalculadoraPMT({
+          custos: montarCustos(corbanOverride),
+          pmt: new PremissasPMT({
+            inadimplencia: pct('in-inadimplencia'), recuperabilidade: pct('in-recuperabilidade'),
+            mediaPmtsInadimplencia: Number.isFinite(num('in-pmt-media')) ? Math.round(num('in-pmt-media')) : 4,
+            prazoExcussao: Math.round(num('in-prazo-excussao')), jurosMora: pct('in-juros-mora'), multaMora: pct('in-multa-mora'),
+            carencia: Number.isFinite(num('in-pmt-carencia')) ? Math.max(0, Math.round(num('in-pmt-carencia'))) : 0,
+            tetoGarantia: $('in-pmt-teto').checked,
+          }),
+          premissas,
+          tetoValorLiberado: teto,
+        });
+      }
+      return new CalculadoraCredito({
+        custos: montarCustos(corbanOverride),
+        premissas,
+        cenarios,
+        tetoValorLiberado: teto,
+      });
+    };
+
+    // Oferta por retorno-alvo nos dois modos (PMT em líquido fixo resolve a sobrecolateralização).
+    const ofertarRetorno = (c, retorno) => {
+      if (!ehPMT) return c.ofertar(valor, prazo, retorno);
+      if (liquidoFixo) return c.ofertarPorLiquidoFixo(valor, prazo, valorLiquidoFixo, retorno, optsPMT);
+      return c.ofertar(valor, prazo, retorno, optsPMT);
+    };
 
     let calc;
     try {
@@ -1307,7 +1711,7 @@ function mesesAte(inicio, pagamento) {
       try {
         // Tabelas da escada: corban travado por degrau; customizada: campo "Comissão do canal".
         const calcTier = tier.corban === undefined ? calc : construirCalc(escadaComCanal ? tier.corban : 0);
-        oferta = calcTier.ofertar(valor, prazo, tier.retorno);
+        oferta = ofertarRetorno(calcTier, tier.retorno);
       } catch (e) { oferta = null; }
       return oferta ? cardOferta(tier, oferta) : cardInviavel(tier);
     }).join('');
@@ -1315,16 +1719,18 @@ function mesesAte(inicio, pagamento) {
     // Conta inversa e taxa comercial (opcionais)
     let simHtml = '';
     const valorDesejado = num('in-valor-desejado');
-    if (valorDesejado > 0){
+    if (liquidoFixo){
+      simHtml += cardLiquidoFixo(valorLiquidoFixo, valorDesejado);
+    } else if (valorDesejado > 0){
       const valorAlvo = teto != null ? Math.min(valorDesejado, teto) : valorDesejado;
       let resultado = null;
-      try { resultado = calc.ofertarPorValorDesejado(valor, prazo, valorAlvo); } catch (e) { resultado = null; }
+      try { resultado = ehPMT ? calc.ofertarPorValorDesejado(valor, prazo, valorAlvo, optsPMT) : calc.ofertarPorValorDesejado(valor, prazo, valorAlvo); } catch (e) { resultado = null; }
       simHtml += cardContaInversa(valorDesejado, valorAlvo, resultado, teto);
     }
     const taxaComercialPct = num('in-taxa-comercial');
     if (taxaComercialPct > 0){
       let resultadoTaxa = null;
-      try { resultadoTaxa = calc.ofertarPorTaxaComercial(valor, prazo, taxaComercialPct / 100); } catch (e) { resultadoTaxa = null; }
+      try { resultadoTaxa = ehPMT ? calc.ofertarPorTaxaComercial(valor, prazo, taxaComercialPct / 100, optsPMT) : calc.ofertarPorTaxaComercial(valor, prazo, taxaComercialPct / 100); } catch (e) { resultadoTaxa = null; }
       simHtml += cardTaxaComercial(taxaComercialPct / 100, resultadoTaxa);
     }
     simWrap.innerHTML = simHtml;
@@ -1337,8 +1743,36 @@ function mesesAte(inicio, pagamento) {
    'in-custas','in-spread','in-haircut','in-inadimplencia','in-recuperabilidade','in-prazo-excussao',
    'in-juros-mora','in-multa-mora','in-iof','in-com-artemis','in-cobranca-artemis','in-tac','in-custo-emissao',
    'in-franquia-emissao','in-volumetria','in-liq-pix','in-liq-ted','in-formalizacao','in-escrow-mensalidade',
-   'in-meses-escrow','in-acompanhamento','in-boleto','in-evento-boleto','in-pct-eventos-boleto','in-cartorio'
+   'in-meses-escrow','in-acompanhamento','in-boleto','in-evento-boleto','in-pct-eventos-boleto','in-cartorio',
+   'in-pmt-media','in-pmt-prazo-ccb','in-pmt-carencia','in-pmt-sobre'
   ].forEach(id => $(id).addEventListener('input', recalcular));
+  $('in-pmt-teto').addEventListener('change', recalcular);
+
+  // Modo da CCB: Bullet | PMT. Padrões que mudam com o modo (PMT = aba CCB PMT);
+  // campo já editado pelo usuário não é sobrescrito.
+  const POR_MODO = {
+    'in-hon-sucumb': { bullet:'30', pmt:'2.5' }, 'in-hon-contr': { bullet:'15', pmt:'40' },
+    'in-inadimplencia': { bullet:'95', pmt:'50' }, 'in-recuperabilidade': { bullet:'50', pmt:'50' },
+    'in-volumetria': { bullet:'10000', pmt:'300' }, 'in-escrow-mensalidade': { bullet:'49.99', pmt:'49.9' },
+  };
+  const editado = {};
+  Object.keys(POR_MODO).forEach(id => $(id).addEventListener('input', () => { editado[id] = true; }));
+  const segModoBullet = $('seg-modo-bullet'), segModoPmt = $('seg-modo-pmt');
+  function aplicarModo(m){
+    modoCCB = m;
+    segModoBullet.setAttribute('aria-pressed', String(m === 'bullet'));
+    segModoPmt.setAttribute('aria-pressed', String(m === 'pmt'));
+    $('pmt-fields').hidden = m !== 'pmt';
+    $('tag-modo').hidden = m !== 'pmt';
+    $('eyebrow-modo').textContent = m === 'pmt' ? 'Legal Equity · CCB PMT' : 'Legal Equity · CCB Bullet';
+    Object.keys(POR_MODO).forEach(id => { if (!editado[id]) $(id).value = POR_MODO[id][m]; });
+    $('modo-hint').textContent = m === 'pmt'
+      ? 'Parcelas mensais fixas; o inadimplente paga as primeiras PMTs e para. Padrões da aba CCB PMT: honorários 2,5% + 40%, inadimplência 50%, volumetria 300, escrow R$ 49,90 (campos que você já editou não mudam).'
+      : 'Pagamento único no vencimento. Inadimplência padrão 95%.';
+    recalcular();
+  }
+  segModoBullet.addEventListener('click', () => aplicarModo('bullet'));
+  segModoPmt.addEventListener('click', () => aplicarModo('pmt'));
 
   // Alternador Com canal / Sem canal da escada
   const segCanalCom = $('seg-canal-com'), segCanalSem = $('seg-canal-sem');
@@ -1386,6 +1820,7 @@ function mesesAte(inicio, pagamento) {
   $('in-data-base').value = toISO(hoje);
   $('in-data-pag').value = toISO(daqui12m);
 
+  try { if (location.hash === '#pmt') { aplicarModo('pmt'); return; } } catch (e) {}
   recalcular();
 })();
 </script>
